@@ -1,0 +1,26 @@
+#!/bin/sh
+
+setup_api_key() {
+    echo "🔑 ตั้ง OPENCODE_API_KEY"
+    echo "รับ API key จาก: https://opencode.ai/settings/api"
+    echo -n "ใส่ API key: "
+    read -r KEY
+    
+    if [ -n "$KEY" ]; then
+        echo "export OPENCODE_API_KEY='$KEY'" >> ~/.zshrc
+        export OPENCODE_API_KEY="$KEY"
+        echo "✅ บันทึกแล้ว"
+    fi
+}
+
+check_api_key() {
+    KEY="${OPENCODE_API_KEY:-}"
+    if [ -z "$KEY" ]; then
+        echo "❌ ยังไม่ได้ตั้ง API key"
+        echo "รัน: setup-api-key"
+        return 1
+    fi
+    echo "$KEY"
+}
+
+setup_api_key "$@"

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+openlink() {
+    URL="$1"
+    if [ -z "$URL" ]; then
+        echo "Usage: openlink <url>"
+        exit 1
+    fi
+    am start -a android.intent.action.VIEW -d "$URL" >/dev/null 2>&1
+    echo "✅ เปิด: $URL"
+}
+
+openlink "$@"

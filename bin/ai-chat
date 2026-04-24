@@ -1,13 +1,31 @@
 #!/bin/sh
 
-API_KEY="${OPENCODE_API_KEY:-}"
-MODEL="${OPENCODE_MODEL:-opencode/minimax-m2.5-free}"
+check_and_setup_key() {
+    KEY="${OPENCODE_API_KEY:-}"
+    if [ -n "$KEY" ] && [ "$KEY" != "your-api-key" ]; then
+        return 0
+    fi
+    
+    echo "❌ ยังไม่ได้ตั้ง API key"
+    echo "เปิดลิงก์สมัคร: https://opencode.ai/settings/api"
+    am start -a android.intent.action.VIEW -d "https://opencode.ai/settings/api" 2>/dev/null
+    
+    echo -n "ใส่ API key: "
+    read -r KEY
+    
+    if [ -n "$KEY" ]; then
+        echo "export OPENCODE_API_KEY='$KEY'" >> ~/.zshrc
+        export OPENCODE_API_KEY="$KEY"
+        echo "✅ บันทึกแล้ว"
+    else
+        echo "❌ ต้องใส่ API key"
+        exit 1
+    fi
+}
 
-if [ -z "$API_KEY" ]; then
-    echo "❌ กรุณาตั้ง OPENCODE_API_KEY ก่อน"
-    echo "export OPENCODE_API_KEY='your-api-key'" >> ~/.bashrc
-    exit 1
-fi
+check_and_setup_key
+
+MODEL="${OPENCODE_MODEL:-opencode/minimax-m2.5-free}"
 
 echo "🤖 AI CLI - พิมพ์ 'exit' ออก"
 echo "─────────────────────"
@@ -24,7 +42,7 @@ while true; do
     CONV_HISTORY=$(echo "$CONV_HISTORY" | jq --arg p "$PROMPT" '. + [{"role":"user","content":$p}]')
     
     RESPONSE=$(curl -s -X POST "https://opencode.ai/api/v1/chat" \
-        -H "Authorization: Bearer $API_KEY" \
+        -H "Authorization: Bearer $OPENCODE_API_KEY" \
         -H "Content-Type: application/json" \
         -d "{
             \"model\": \"$MODEL\",

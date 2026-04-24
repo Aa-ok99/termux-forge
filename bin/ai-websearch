@@ -1,5 +1,30 @@
 #!/bin/sh
 
+check_and_setup_key() {
+    KEY="${OPENCODE_API_KEY:-}"
+    if [ -n "$KEY" ] && [ "$KEY" != "your-api-key" ]; then
+        return 0
+    fi
+    
+    echo "❌ ยังไม่ได้ตั้ง API key"
+    echo "เปิดลิงก์สมัคร: https://opencode.ai/settings/api"
+    am start -a android.intent.action.VIEW -d "https://opencode.ai/settings/api" 2>/dev/null
+    
+    echo -n "ใส่ API key: "
+    read -r KEY
+    
+    if [ -n "$KEY" ]; then
+        echo "export OPENCODE_API_KEY='$KEY'" >> ~/.zshrc
+        export OPENCODE_API_KEY="$KEY"
+        echo "✅ บันทึกแล้ว"
+    else
+        echo "❌ ต้องใส่ API key"
+        exit 1
+    fi
+}
+
+check_and_setup_key
+
 NUM_RESULTS="${1:-8}"
 shift
 
@@ -9,18 +34,12 @@ if [ $# -eq 0 ]; then
 fi
 
 QUERY="$*"
-API_KEY="${OPENCODE_API_KEY:-}"
-
-if [ -z "$API_KEY" ]; then
-    echo "❌ กรุณาตั้ง OPENCODE_API_KEY"
-    exit 1
-fi
 
 echo "🔍 ค้นหา: $QUERY"
 echo "─────────────────────"
 
 RESPONSE=$(curl -s -X POST "https://opencode.ai/api/v1/websearch" \
-    -H "Authorization: Bearer $API_KEY" \
+    -H "Authorization: Bearer $OPENCODE_API_KEY" \
     -H "Content-Type: application/json" \
     -d "{
         \"query\": \"$QUERY\",
