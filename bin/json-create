@@ -1,0 +1,97 @@
+#!/data/data/com.termux/files/home/bin/bash
+
+JSON_CREATE() {
+    local FILE="$1"
+    local TYPE="$2"
+    
+    if [[ -z "$FILE" ]]; then
+        echo "Usage: json-create <file> [type]"
+        echo "Types: package, config, tsconfig, compose, github"
+        return 1
+    fi
+    
+    case "$TYPE" in
+        package)
+            cat > "$FILE" << 'EOF'
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}
+EOF
+            ;;
+        config)
+            cat > "$FILE" << 'EOF'
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "config": {
+    "host": "localhost",
+    "port": 3000
+  }
+}
+EOF
+            ;;
+        tsconfig)
+            cat > "$FILE" << 'EOF'
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
+EOF
+            ;;
+        compose)
+            cat > "$FILE" << 'EOF'
+{
+  "version": "3.8",
+  "services": {
+    "app": {
+      "build": ".",
+      "ports": ["3000:3000"],
+      "environment": ["NODE_ENV=production"]
+    }
+  }
+}
+EOF
+            ;;
+        github)
+            cat > "$FILE" << 'EOF'
+{
+  "name": "",
+  "on": ["push", "pull_request"],
+  "jobs": {
+    "build": {
+      "runs-on": "ubuntu-latest",
+      "steps": [
+        { "uses": "actions/checkout@v3" }
+      ]
+    }
+  }
+}
+EOF
+            ;;
+        *)
+            echo "{}" > "$FILE"
+            ;;
+    esac
+    
+    echo "✅ สร้าง $FILE เสร็จ"
+}
+
+JSON_CREATE "$@"

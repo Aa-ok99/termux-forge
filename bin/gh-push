@@ -1,0 +1,27 @@
+#!/data/data/com.termux/files/home/bin/bash
+
+GH_PUSH() {
+    local MSG="$1"
+    
+    if [[ -z "$MSG" ]]; then
+        echo "ใช้: gh-push <commit-message>"
+        return 1
+    fi
+    
+    git add -A
+    git commit -m "$MSG"
+    
+    local BRANCH=$(git branch --show-current)
+    local REMOTE=$(git remote get-url origin 2>/dev/null || echo "")
+    
+    if [[ -z "$REMOTE" ]]; then
+        echo "❌ ไม่มี remote origin"
+        echo "ใช้: git remote add origin <url>"
+        return 1
+    fi
+    
+    git push -u origin "$BRANCH"
+    echo "✅ Push เสร็จ!"
+}
+
+GH_PUSH "$@"
