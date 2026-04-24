@@ -1,18 +1,17 @@
-#!/data/data/com.termux/files/home/bin/bash
+#!/bin/sh
 
-JSON_CREATE() {
-    local FILE="$1"
-    local TYPE="$2"
-    
-    if [[ -z "$FILE" ]]; then
-        echo "Usage: json-create <file> [type]"
-        echo "Types: package, config, tsconfig, compose, github"
-        return 1
-    fi
-    
-    case "$TYPE" in
-        package)
-            cat > "$FILE" << 'EOF'
+FILE="$1"
+TYPE="$2"
+
+if [ -z "$FILE" ]; then
+    echo "Usage: json-create <file> [type]"
+    echo "Types: package, config, tsconfig, compose, github"
+    exit 1
+fi
+
+case "$TYPE" in
+    package)
+        cat > "$FILE" << 'EOF'
 {
   "name": "my-project",
   "version": "1.0.0",
@@ -27,9 +26,9 @@ JSON_CREATE() {
   "license": "MIT"
 }
 EOF
-            ;;
-        config)
-            cat > "$FILE" << 'EOF'
+        ;;
+    config)
+        cat > "$FILE" << 'EOF'
 {
   "name": "my-project",
   "version": "1.0.0",
@@ -39,9 +38,9 @@ EOF
   }
 }
 EOF
-            ;;
-        tsconfig)
-            cat > "$FILE" << 'EOF'
+        ;;
+    tsconfig)
+        cat > "$FILE" << 'EOF'
 {
   "compilerOptions": {
     "target": "ES2020",
@@ -55,9 +54,9 @@ EOF
   "exclude": ["node_modules"]
 }
 EOF
-            ;;
-        compose)
-            cat > "$FILE" << 'EOF'
+        ;;
+    compose)
+        cat > "$FILE" << 'EOF'
 {
   "version": "3.8",
   "services": {
@@ -69,9 +68,9 @@ EOF
   }
 }
 EOF
-            ;;
-        github)
-            cat > "$FILE" << 'EOF'
+        ;;
+    github)
+        cat > "$FILE" << 'EOF'
 {
   "name": "",
   "on": ["push", "pull_request"],
@@ -85,13 +84,10 @@ EOF
   }
 }
 EOF
-            ;;
-        *)
-            echo "{}" > "$FILE"
-            ;;
-    esac
-    
-    echo "✅ สร้าง $FILE เสร็จ"
-}
+        ;;
+    *)
+        echo "{}" > "$FILE"
+        ;;
+esac
 
-JSON_CREATE "$@"
+echo "✅ สร้าง $FILE เสร็จ"

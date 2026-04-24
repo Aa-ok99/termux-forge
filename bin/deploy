@@ -1,45 +1,41 @@
-#!/data/data/com.termux/files/home/bin/bash
+#!/bin/sh
 
-DEPLOY() {
-    local PLATFORM="$1"
-    local NAME="$2"
-    
-    if [[ -z "$PLATFORM" ]]; then
-        echo "ใช้: deploy <platform> <ชื่อ>"
-        echo "Platforms: vercel, netlify, cloudflare, flyio, railway, heroku"
-        return 1
-    fi
-    
-    case "$PLATFORM" in
-        vercel)
-            npm i -g vercel
-            vercel --prod
-            ;;
-        netlify)
-            npm i -g netlify-cli
-            netlify deploy --prod
-            ;;
-        cloudflare)
-            npm i -g wrangler
-            wrangler deploy
-            ;;
-        flyio)
-            fly launch
-            fly deploy
-            ;;
-        railway)
-            railway up
-            ;;
-        heroku)
-            git push heroku main
-            ;;
-        *)
-            echo "❌ ไม่รู้จัก platform: $PLATFORM"
-            return 1
-            ;;
-    esac
-    
-    echo "✅ Deploy เสร็จ!"
-}
+PLATFORM="$1"
+NAME="$2"
 
-DEPLOY "$@"
+if [ -z "$PLATFORM" ]; then
+    echo "ใช้: deploy <platform> <ชื่อ>"
+    echo "Platforms: vercel, netlify, cloudflare, flyio, railway, heroku"
+    exit 1
+fi
+
+case "$PLATFORM" in
+    vercel)
+        npm i -g vercel
+        vercel --prod
+        ;;
+    netlify)
+        npm i -g netlify-cli
+        netlify deploy --prod
+        ;;
+    cloudflare)
+        npm i -g wrangler
+        wrangler deploy
+        ;;
+    flyio)
+        fly launch
+        fly deploy
+        ;;
+    railway)
+        railway up
+        ;;
+    heroku)
+        git push heroku main
+        ;;
+    *)
+        echo "❌ ไม่รู้จัก platform: $PLATFORM"
+        exit 1
+        ;;
+esac
+
+echo "✅ Deploy เสร็จ!"

@@ -1,43 +1,39 @@
-#!/data/data/com.termux/files/home/bin/bash
+#!/bin/sh
 
-NEW_PROJECT() {
-    local TEMPLATE="${1:-basic}"
-    local NAME="$2"
-    
-    if [[ -z "$NAME" ]]; then
-        echo "ใช้: new-project <template> <ชื่อโปรเจ็ค>"
-        echo "Templates: basic, node, python, react, go, rust"
-        return 1
-    fi
-    
-    mkdir -p "$NAME"
-    cd "$NAME"
-    
-    case "$TEMPLATE" in
-        node)
-            npm init -y
-            ;;
-        python)
-            echo '#!/usr/bin/env python3' > main.py
-            ;;
-        react)
-            npx create-react-app "$NAME" 2>/dev/null || \
-                echo '{"name":"'$NAME'","version":"1.0.0"}' > package.json
-            ;;
-        go)
-            go mod init "$NAME"
-            ;;
-        rust)
-            cargo init --bin "$NAME"
-            ;;
-        *)
-            echo "# $NAME" > README.md
-            ;;
-    esac
-    
-    git init
-    echo "node_modules/" > .gitignore
-    echo "✅ สร้าง $NAME เสร็จ"
-}
+TEMPLATE="${1:-basic}"
+NAME="$2"
 
-NEW_PROJECT "$@"
+if [ -z "$NAME" ]; then
+    echo "ใช้: new-project <template> <ชื่อโปรเจ็ค>"
+    echo "Templates: basic, node, python, react, go, rust"
+    exit 1
+fi
+
+mkdir -p "$NAME"
+cd "$NAME"
+
+case "$TEMPLATE" in
+    node)
+        npm init -y
+        ;;
+    python)
+        echo '#!/usr/bin/env python3' > main.py
+        ;;
+    react)
+        npx create-react-app "$NAME" 2>/dev/null || \
+            echo '{"name":"'$NAME'","version":"1.0.0"}' > package.json
+        ;;
+    go)
+        go mod init "$NAME"
+        ;;
+    rust)
+        cargo init --bin "$NAME"
+        ;;
+    *)
+        echo "# $NAME" > README.md
+        ;;
+esac
+
+git init
+echo "node_modules/" > .gitignore
+echo "✅ สร้าง $NAME เสร็จ"

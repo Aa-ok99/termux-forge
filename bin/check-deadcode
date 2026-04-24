@@ -1,36 +1,30 @@
-#!/data/data/com.termux/files/home/bin/bash
+#!/bin/sh
 
-CHECK_DEADCODE() {
-    local EXT="${1:-js}"
-    local DIR="${2:-.}"
-    
-    local TOTAL=0
-    
-    echo "🔍 ตรวจ dead code..."
-    echo "─────────────────────"
-    
-    case "$EXT" in
-        js|ts|jsx|tsx)
-            grep -rn "function\s\+\w+" "$DIR" --include="*.$EXT" | head -20
-            grep -rn "const\s\+\w+\s*=" "$DIR" --include="*.$EXT" | head -20
-            ;;
-        py)
-            grep -rn "def\s\w+" "$DIR" --include="*.py" | head -20
-            ;;
-        go)
-            grep -rn "func\s\w+" "$DIR" --include="*.go" | head -20
-            ;;
-        rs)
-            grep -rn "fn\s\w+" "$DIR" --include="*.rs" | head -20
-            ;;
-        *)
-            echo "รองรับ: js, ts, py, go, rs"
-            return 1
-            ;;
-    esac
-    
-    echo "─────────────────────"
-    echo "✅ เสร็จ"
-}
+EXT="${1:-js}"
+DIR="${2:-.}"
 
-CHECK_DEADCODE "$@"
+echo "🔍 ตรวจ dead code..."
+echo "─────────────────────"
+
+case "$EXT" in
+    js|ts|jsx|tsx)
+        grep -rn "function " "$DIR" --include="*.$EXT" | head -20
+        grep -rn "const " "$DIR" --include="*.$EXT" | head -20
+        ;;
+    py)
+        grep -rn "def " "$DIR" --include="*.py" | head -20
+        ;;
+    go)
+        grep -rn "func " "$DIR" --include="*.go" | head -20
+        ;;
+    rs)
+        grep -rn "fn " "$DIR" --include="*.rs" | head -20
+        ;;
+    *)
+        echo "รองรับ: js, ts, py, go, rs"
+        exit 1
+        ;;
+esac
+
+echo "─────────────────────"
+echo "✅ เสร็จ"

@@ -1,35 +1,31 @@
-#!/data/data/com.termux/files/home/bin/bash
+#!/bin/sh
 
-AI_WEBSEARCH() {
-    local NUM_RESULTS="${1:-8}"
-    shift
-    
-    if [[ $# -eq 0 ]]; then
-        echo "ใช้: ai-websearch <จำนวน> <คำค้น>"
-        return 1
-    fi
-    
-    local QUERY="$*"
-    local API_KEY="${OPENCODE_API_KEY:-}"
-    
-    if [[ -z "$API_KEY" ]]; then
-        echo "❌ กรุณาตั้ง OPENCODE_API_KEY"
-        return 1
-    fi
-    
-    echo "🔍 ค้นหา: $QUERY"
-    echo "─────────────────────"
-    
-    local RESPONSE=$(curl -s -X POST "https://opencode.ai/api/v1/websearch" \
-        -H "Authorization: Bearer $API_KEY" \
-        -H "Content-Type: application/json" \
-        -d "{
-            \"query\": \"$QUERY\",
-            \"num_results\": $NUM_RESULTS
-        }")
-    
-    echo "$RESPONSE" | jq -r '.results[] | "[\(.title)](\(.url))\n\(.description)\n"' 2>/dev/null || \
-        echo "$RESPONSE"
-}
+NUM_RESULTS="${1:-8}"
+shift
 
-AI_WEBSEARCH "$@"
+if [ $# -eq 0 ]; then
+    echo "ใช้: ai-websearch <จำนวน> <คำค้น>"
+    exit 1
+fi
+
+QUERY="$*"
+API_KEY="${OPENCODE_API_KEY:-}"
+
+if [ -z "$API_KEY" ]; then
+    echo "❌ กรุณาตั้ง OPENCODE_API_KEY"
+    exit 1
+fi
+
+echo "🔍 ค้นหา: $QUERY"
+echo "─────────────────────"
+
+RESPONSE=$(curl -s -X POST "https://opencode.ai/api/v1/websearch" \
+    -H "Authorization: Bearer $API_KEY" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"query\": \"$QUERY\",
+        \"num_results\": $NUM_RESULTS
+    }")
+
+echo "$RESPONSE" | jq -r '.results[] | "[\(.title)](\(.url))\n\(.description)\n"' 2>/dev/null || \
+    echo "$RESPONSE"

@@ -1,43 +1,38 @@
-#!/data/data/com.termux/files/home/bin/bash
+#!/bin/sh
 
-AI_CHAT() {
-    local API_KEY="${OPENCODE_API_KEY:-}"
-    local MODEL="${OPENCODE_MODEL:-opencode/minimax-m2.5-free}"
-    
-    if [[ -z "$API_KEY" ]]; then
-        echo "❌ กรุณาตั้ง OPENCODE_API_KEY ก่อน"
-        echo "export OPENCODE_API_KEY='your-api-key'" >> ~/.bashrc
-        return 1
-    fi
-    
-    echo "🤖 AI CLI - พิมพ์ 'exit' ออก"
-    echo "─────────────────────"
-    
-    local CONV_HISTORY="[]"
-    
-    while true; do
-        echo -n -e "\n\033[1;32mคุณ>\033[0m "
-        read -r PROMPT
-        
-        [[ "$PROMPT" == "exit" ]] && break
-        [[ -z "$PROMPT" ]] && continue
-        
-        CONV_HISTORY=$(echo "$CONV_HISTORY" | jq --arg p "$PROMPT" '. + [{"role":"user","content":$p}]')
-        
-        local RESPONSE=$(curl -s -X POST "https://opencode.ai/api/v1/chat" \
-            -H "Authorization: Bearer $API_KEY" \
-            -H "Content-Type: application/json" \
-            -M "application/json" \
-            -d "{
-                \"model\": \"$MODEL\",
-                \"messages\": $(echo "$CONV_HISTORY")
-            }")
-        
-        local ANSWER=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // .error.message')
-        echo -e "\n\033[1;34mAI>\033[0m $ANSWER"
-        
-        CONV_HISTORY=$(echo "$CONV_HISTORY" | jq --arg a "$ANSWER" '. + [{"role":"assistant","content":$a}]')
-    done
-}
+API_KEY="${OPENCODE_API_KEY:-}"
+MODEL="${OPENCODE_MODEL:-opencode/minimax-m2.5-free}"
 
-AI_CHAT "$@"
+if [ -z "$API_KEY" ]; then
+    echo "❌ กรุณาตั้ง OPENCODE_API_KEY ก่อน"
+    echo "export OPENCODE_API_KEY='your-api-key'" >> ~/.bashrc
+    exit 1
+fi
+
+echo "🤖 AI CLI - พิมพ์ 'exit' ออก"
+echo "─────────────────────"
+
+CONV_HISTORY="[]"
+
+while true; do
+    echo -n -e "\n\033[1;32mคุณ>\033[0m "
+    read -r PROMPT
+    
+    [ "$PROMPT" = "exit" ] && break
+    [ -z "$PROMPT" ] && continue
+    
+    CONV_HISTORY=$(echo "$CONV_HISTORY" | jq --arg p "$PROMPT" '. + [{"role":"user","content":$p}]')
+    
+    RESPONSE=$(curl -s -X POST "https://opencode.ai/api/v1/chat" \
+        -H "Authorization: Bearer $API_KEY" \
+        -H "Content-Type: application/json" \
+        -d "{
+            \"model\": \"$MODEL\",
+            \"messages\": $(echo "$CONV_HISTORY")
+        }")
+    
+    ANSWER=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // .error.message')
+    echo -e "\n\033[1;34mAI>\033[0m $ANSWER"
+    
+    CONV_HISTORY=$(echo "$CONV_HISTORY" | jq --arg a "$ANSWER" '. + [{"role":"assistant","content":$a}]')
+done
